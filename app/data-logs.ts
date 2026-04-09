@@ -39,6 +39,7 @@ export const auditData = [
     aiResponse: "Draft kontrak selesai dibuat. Perhatian: Klausul 'Force Majeure' dan 'Termination' memerlukan persetujuan legal manual.",
     category: "Legal & HR"
   }
+  
 ];
 
 // Menghitung data secara otomatis

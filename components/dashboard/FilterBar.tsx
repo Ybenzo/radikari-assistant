@@ -45,6 +45,7 @@ export function FilterBar({
             <option value="Success">Success</option>
             <option value="Pending">Pending</option>
             <option value="Error">Error</option>
+            <option value="Rejected">Rejected</option>
           </select>
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none text-slate-400">
             <svg

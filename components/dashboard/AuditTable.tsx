@@ -1,4 +1,4 @@
-import { Eye, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { Eye, CheckCircle2, Clock, AlertCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -16,14 +16,19 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog";
 
 export function AuditTable({
   data,
   searchQuery,
+  onResolve,
+  onReject,
 }: {
   data: any[];
   searchQuery: string;
+  onResolve: (id: string) => void;
+  onReject: (id: string) => void;
 }) {
   return (
     <div className="bg-white border border-slate-200 rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden">
@@ -69,6 +74,10 @@ export function AuditTable({
                   {log.status === "Pending" && (
                     <Clock size={16} className="text-amber-500" />
                   )}
+                  {log.status === "Rejected" && (
+                    <XCircle size={16} className="text-slate-500" />
+                  )}{" "}
+                  {/* Pastikan XCircle sudah di-import */}
                   {log.status === "Error" && (
                     <AlertCircle size={16} className="text-red-500" />
                   )}
@@ -78,7 +87,9 @@ export function AuditTable({
                         ? "text-green-700"
                         : log.status === "Pending"
                           ? "text-amber-700"
-                          : "text-red-700"
+                          : log.status === "Rejected"
+                            ? "text-slate-600"
+                            : "text-red-700"
                     }`}
                   >
                     {log.status}
@@ -127,15 +138,38 @@ export function AuditTable({
                       </div>
                     </div>
                     <DialogFooter className="border-t border-slate-100 pt-6 flex gap-3 sm:justify-between">
-                      <Button
-                        variant="outline"
-                        className="flex-1 rounded-xl h-11 border-red-100 text-red-600 hover:bg-red-50 font-bold"
-                      >
-                        Reject
-                      </Button>
-                      <Button className="flex-1 rounded-xl h-11 bg-indigo-600 text-white hover:bg-indigo-700 font-bold shadow-lg">
-                        Approve & Deploy
-                      </Button>
+                      {log.status === "Pending" ? (
+                        <>
+                          <DialogClose asChild>
+                            <Button
+                              variant="outline"
+                              onClick={() => onReject(log.id)}
+                              className="flex-1 rounded-xl h-11 border-red-100 text-red-600 hover:bg-red-50 font-bold"
+                            >
+                              Reject
+                            </Button>
+                          </DialogClose>
+
+                          <DialogClose asChild>
+                            <Button
+                              onClick={() => onResolve(log.id)}
+                              className="flex-1 rounded-xl h-11 bg-indigo-600 text-white hover:bg-indigo-700 font-bold shadow-lg shadow-indigo-100 transition-all"
+                            >
+                              Approve & Deploy
+                            </Button>
+                          </DialogClose>
+                        </>
+                      ) : (
+                        /* Kondisi: Jika status SUDAH Success atau Rejected, tampilkan tombol tutup saja */
+                        <DialogClose asChild>
+                          <Button
+                            variant="secondary"
+                            className="w-full rounded-xl h-11 font-bold text-slate-600 bg-slate-100 hover:bg-slate-200"
+                          >
+                            Close Record
+                          </Button>
+                        </DialogClose>
+                      )}
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
