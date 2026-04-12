@@ -1,33 +1,67 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-export default function ChatAssistant({ activeMenu, isChatOpen, setIsChatOpen }) {
+export default function ChatAssistant({ user }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const firstName = user?.name ? user.name.split(' ')[0] : 'User';
+
+  const [messages, setMessages] = useState([
+    { text: `Halo ${firstName}! Ada yang bisa gue bantu di sistem Radikari?`, isBot: true }
+  ]);
+  const [input, setInput] = useState("");
+
+  const handleSend = (e) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+
+    const newMessages = [...messages, { text: input, isBot: false }];
+    setMessages(newMessages);
+    setInput("");
+
+    setTimeout(() => {
+      setMessages(prev => [...prev, { 
+        text: `Siap ${firstName}, perintah lo lagi gue proses nih.`, 
+        isBot: true 
+      }]);
+    }, 1000);
+  };
+
   return (
-    <aside className={`
-      fixed inset-y-0 right-0 z-[110] bg-[#0f172a] border-l border-slate-800 
-      transition-all duration-300 flex flex-col
-      ${isChatOpen ? 'w-[85vw] md:w-96 translate-x-0 shadow-2xl' : 'w-0 translate-x-full'}
-    `}>
-      <div className="p-6 border-b border-slate-800 flex justify-between items-center shrink-0">
-        <h3 className="text-[10px] font-black uppercase tracking-widest text-white">Agent <span className="text-red-600">{activeMenu}</span></h3>
-        
-        {/* TOMBOL X UNTUK MENUTUP */}
-        <button 
-          onClick={() => setIsChatOpen(false)} 
-          className="text-slate-500 hover:text-white p-2 transition-colors"
-        >
-          ✕
-        </button>
-      </div>
-
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
-        <div className="bg-slate-800/50 p-4 rounded-2xl text-[11px] text-slate-300 border border-slate-800">
-          Sistem siap menerima instruksi untuk divisi {activeMenu}.
+    <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end">
+      {isOpen && (
+        <div className="mb-4 w-80 h-[450px] bg-slate-900 border border-white/10 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5">
+          <div className="p-5 bg-red-600 text-white flex items-center gap-2">
+            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+            <span className="font-black italic uppercase text-[10px] tracking-widest">Radikari AI Assistant</span>
+          </div>
+          <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-[#020617]/50">
+            {messages.map((m, i) => (
+              <div key={i} className={`flex ${m.isBot ? 'justify-start' : 'justify-end'}`}>
+                <div className={`max-w-[85%] p-3 rounded-2xl text-[10px] ${
+                  m.isBot ? 'bg-slate-800 text-slate-300 border border-white/5' : 'bg-red-600 text-white font-bold'
+                }`}>
+                  {m.text}
+                </div>
+              </div>
+            ))}
+          </div>
+          <form onSubmit={handleSend} className="p-4 border-t border-white/5 bg-slate-900">
+            <input 
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={`Tanya AI, ${firstName}...`}
+              className="w-full bg-slate-800 border border-white/5 rounded-xl p-3 text-[10px] focus:outline-none focus:border-red-600 text-white"
+            />
+          </form>
         </div>
-      </div>
-
-      <div className="p-4 border-t border-slate-800 shrink-0">
-        <input type="text" placeholder="Type..." className="w-full bg-slate-900 border border-slate-800 rounded-xl py-3 px-4 text-[11px] outline-none focus:border-red-600 transition-all" />
-      </div>
-    </aside>
+      )}
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center shadow-lg shadow-red-900/40 hover:scale-110 transition-all"
+      >
+        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+        </svg>
+      </button>
+    </div>
   );
 }
